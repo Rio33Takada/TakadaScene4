@@ -31,6 +31,7 @@ public class Enemy : MonoBehaviour
 	/// </summary>
 	public void Start()
     {
+		worldMatrix_ *= Matrix4x4.Translate(transform.position);
     }
 
     /// <summary>  
@@ -38,5 +39,34 @@ public class Enemy : MonoBehaviour
     /// </summary>  
     public void Update()
     {
-    }
+		//索敵
+		var normalz = new Vector3(0, 0, 1);
+		var enemyForward = worldMatrix_ * normalz;
+		var enemyViewCos = Mathf.Cos(20);//20度
+
+		var enemyToPlayer = (player_.transform.position - transform.position).normalized;
+		var dot = Vector3.Dot(enemyForward, enemyToPlayer);
+
+		Debug.Log(Mathf.Acos(dot));
+		if (enemyViewCos <= dot)
+		{
+			//回転
+			var rad = Mathf.Clamp(Mathf.Acos(dot), 0, Mathf.Deg2Rad * 10);
+
+			var cross = Vector3.Cross(enemyForward, enemyToPlayer);
+
+			rad *= (cross.y / Mathf.Abs(cross.y));//符号付きを絶対値で割る(1か-1になる)
+
+			Matrix4x4 rotMatrix = Matrix4x4.Rotate(Quaternion.Euler(0, rad, 0));
+
+			//移動
+			Matrix4x4 transMatrix = Matrix4x4.Translate(new Vector3(0, 0, 0.2f));
+
+			worldMatrix_ = worldMatrix_ * (transMatrix * rotMatrix);
+
+			//最終移動
+			transform.position = worldMatrix_.GetColumn(3);
+			transform.rotation = worldMatrix_.rotation;
+		}
+	}
 }
