@@ -31,7 +31,8 @@ public class Enemy : MonoBehaviour
 	/// </summary>
 	public void Start()
     {
-		worldMatrix_ *= Matrix4x4.Translate(transform.position);
+		//worldMatrix_ *= Matrix4x4.Translate(transform.position);
+		worldMatrix_ = Matrix4x4.TRS(transform.position, Quaternion.identity, Vector3.one);
     }
 
     /// <summary>  
@@ -50,7 +51,8 @@ public class Enemy : MonoBehaviour
 		if (enemyViewCos <= dot)
 		{
 			//回転
-			var rad = Mathf.Clamp(Mathf.Acos(dot), 0, Mathf.Deg2Rad * 10);
+			//var rad = Mathf.Clamp(Mathf.Acos(dot), 0, Mathf.Deg2Rad * 10);
+			var rad = Mathf.Min(Mathf.Acos(dot), (10.0f * Mathf.Deg2Rad));
 
 			var cross = Vector3.Cross(enemyForward, enemyToPlayer);
 
